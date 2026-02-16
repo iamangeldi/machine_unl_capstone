@@ -1,92 +1,89 @@
-Machine Unlearning – LoRA Reconstruction Attack
+# Machine Unlearning – LoRA Reconstruction Attack
 
 This project explores whether a LoRA adapter can be reconstructed after being fused into a base diffusion model.
 
-The main idea:
+## Main Idea
 
-If a LoRA is fused into a model, can an attacker recover it by computing weight differences and applying SVD?
+If a LoRA is fused into a model, can an attacker recover it by computing weight differences and applying Singular Value Decomposition (SVD)?
 
-What We Did
-1️⃣ Train a LoRA Adapter
+---
 
-Notebook: Copy_of_SDXL_DreamBooth_LoRA_.ipynb
+# What We Did
 
-Used SDXL as the base model.
+## 1. Train a LoRA Adapter
 
-Fine-tuned a LoRA adapter on a custom dataset.
+Notebook: `Copy_of_SDXL_DreamBooth_LoRA_.ipynb`
 
-Uploaded the trained LoRA to HuggingFace.
+- Used SDXL as the base model  
+- Fine-tuned a LoRA adapter on a custom dataset  
+- Uploaded the trained LoRA to HuggingFace  
 
 This notebook handles:
 
-LoRA training
+- LoRA training  
+- Saving adapter weights  
+- Uploading to HuggingFace  
 
-Saving adapter weights
+---
 
-Uploading to HuggingFace
+## 2. Fuse and Reconstruct (Attack)
 
-2️⃣ Fuse and Reconstruct (Attack)
-
-Notebook: train.ipynb
+Notebook: `train.ipynb`
 
 This notebook performs the core experiment:
 
-Load SDXL base model
+- Load SDXL base model  
+- Load trained LoRA adapter  
+- Fuse LoRA into the base model  
+- Save fused model weights  
 
-Load trained LoRA adapter
-
-Fuse LoRA into the base model
-
-Save fused model weights
-
-Compute weight difference:
+Then compute the weight difference:
 
 ΔW = W_fused − W_base
 
+Apply Singular Value Decomposition:
 
-Apply SVD to ΔW
+ΔW = U Σ Vᵀ
 
-Approximate low-rank matrices
+- Approximate low-rank matrices  
+- Reconstruct a recovered LoRA adapter  
 
-Reconstruct a recovered LoRA adapter
+The goal is to demonstrate that LoRA fusion does not necessarily prevent recovery.
 
-The goal is to show that LoRA fusion does not necessarily prevent recovery.
+---
 
-Repository Files
-train.ipynb
-Copy_of_SDXL_DreamBooth_LoRA_.ipynb
-README.md
+# Repository Files
 
+train.ipynb  
+Copy_of_SDXL_DreamBooth_LoRA_.ipynb  
+README.md  
 
-Copy_of_SDXL_DreamBooth_LoRA_.ipynb → Training + upload
+- Copy_of_SDXL_DreamBooth_LoRA_.ipynb → Training + upload  
+- train.ipynb → Fusion + SVD reconstruction attack  
 
-train.ipynb → Fusion + SVD reconstruction attack
+---
 
-Important Note About Notebook Preview
+# Important Note About Notebook Preview
 
 These notebooks:
 
-Generate images dynamically
-
-Require GPU runtime
-
-Load large diffusion models
-
-Save intermediate weights
+- Generate images dynamically  
+- Require GPU runtime  
+- Load large diffusion models  
+- Save intermediate weights  
 
 Because of this:
 
-⚠️ GitHub preview may not render them correctly
-⚠️ Outputs may appear missing in browser view
+GitHub preview may not render them correctly.  
+Notebook outputs may appear missing in browser view.  
 
-However:
+However, everything works when the repository is cloned and run locally or in Google Colab.
 
-✅ Everything works when the repo is cloned and run locally or in Google Colab.
+---
 
-To run:
+# How to Run
 
-git clone <your-repo-url>
-cd <repo-name>
+git clone <your-repo-url>  
+cd <repo-name>  
 
-
-Then open the notebooks locally or upload to Colab. 
+Then open the notebooks locally or upload them to Google Colab.
