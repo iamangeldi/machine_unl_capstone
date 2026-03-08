@@ -34,15 +34,15 @@ To train the initial LoRA, you will need to compile and upload your own dataset 
 
 Run the notebooks in the following order to reproduce the experiment:
 
-### 1. `Copy_of_SDXL_DreamBooth_LoRA_.ipynb` (Training)
+### 1. `1_train_lora.ipynb` (Training)
 * **What it does:** Uses SDXL as the base model to fine-tune a LoRA adapter on your uploaded custom image dataset. It also outputs initial sample generations to verify the training.
 * **Action Required:** Upload your custom images and log in via the Hugging Face UI widget.
 
-### 2. `train.ipynb` (Fusion & Extraction Attack)
+### 2. `2_extraction_fusing.ipynb` (Fusion & Extraction Attack)
 * **What it does:** Loads the trained LoRA, fuses it into the main SDXL body, extracts the weight difference ($\Delta W$), and recreates a recovered LoRA.
 * **Action Required:** Log in via the Hugging Face UI widget to access the necessary models.
 
-### 3. `metrics.ipynb` (Evaluation)
+### 3. `3_evaluation_metrics.ipynb` (Evaluation)
 * **What it does:** Opens the resulting files and conducts evaluation metrics, including CLIP embedding analysis and PCA (Principal Component Analysis) deconstruction. It also generates comparison images based on defined prompts.
 * **Action Required:** You must manually input your Hugging Face token into the code. You will also need to adjust the hardcoded prompts (see below).
 
