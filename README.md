@@ -1,89 +1,68 @@
 # Machine Unlearning – LoRA Reconstruction Attack
 
-This project explores whether a LoRA adapter can be reconstructed after being fused into a base diffusion model.
+This repository explores the vulnerabilities of machine unlearning in diffusion models. Specifically, we investigate whether a Low-Rank Adaptation (LoRA) adapter can be reconstructed after being fused into a base model (Stable Diffusion XL).
 
 ## Main Idea
 
-If a LoRA is fused into a model, can an attacker recover it by computing weight differences and applying Singular Value Decomposition (SVD)?
+When a LoRA is fused into a model, the weights are combined. We demonstrate a recovery attack to extract those original LoRA weights by computing the weight differences and applying Singular Value Decomposition (SVD):
+
+1. **Compute Weight Difference:**
+   $$\Delta W = W_{\text{fused}} - W_{\text{base}}$$
+
+2. **Apply Singular Value Decomposition (SVD):**
+   $$\Delta W = U \Sigma V^T$$
+
+By approximating low-rank matrices from this decomposition, we reconstruct the recovered LoRA adapter to show that standard LoRA fusion does not prevent extraction attacks.
 
 ---
 
-# What We Did
+## Prerequisites & Setup
 
-## 1. Train a LoRA Adapter
+To reproduce this project, you will need to prepare a few things before running the notebooks:
 
-Notebook: `Copy_of_SDXL_DreamBooth_LoRA_.ipynb`
+### 1. Hugging Face Account & Access Tokens
+You must have a [Hugging Face](https://huggingface.co/) account and generate an Access Token with **Read and Write** permissions.
+* **UI Login:** For `Copy_of_SDXL_DreamBooth_LoRA_.ipynb` and `train.ipynb`, you will be prompted to log in via a Hugging Face UI widget within the notebook.
+* **Hardcoded Token:** For `metrics.ipynb`, you will need to directly hardcode your Hugging Face access token into the designated cell to load the models.
 
-- Used SDXL as the base model  
-- Fine-tuned a LoRA adapter on a custom dataset  
-- Uploaded the trained LoRA to HuggingFace  
-
-This notebook handles:
-
-- LoRA training  
-- Saving adapter weights  
-- Uploading to HuggingFace  
+### 2. Custom Training Data
+To train the initial LoRA, you will need to compile and upload your own dataset of images. You will be prompted to upload these images when running the first notebook (`Copy_of_SDXL_DreamBooth_LoRA_.ipynb`). *(Note: This repository includes a `tattoo_refs` folder as an example of the reference data used for my specific scenario).*
 
 ---
 
-## 2. Fuse and Reconstruct (Attack)
+## Repository Files & Workflow
 
-Notebook: `train.ipynb`
+Run the notebooks in the following order to reproduce the experiment:
 
-This notebook performs the core experiment:
+### 1. `Copy_of_SDXL_DreamBooth_LoRA_.ipynb` (Training)
+* **What it does:** Uses SDXL as the base model to fine-tune a LoRA adapter on your uploaded custom image dataset. It also outputs initial sample generations to verify the training.
+* **Action Required:** Upload your custom images and log in via the Hugging Face UI widget.
 
-- Load SDXL base model  
-- Load trained LoRA adapter  
-- Fuse LoRA into the base model  
-- Save fused model weights  
+### 2. `train.ipynb` (Fusion & Extraction Attack)
+* **What it does:** Loads the trained LoRA, fuses it into the main SDXL body, extracts the weight difference ($\Delta W$), and recreates a recovered LoRA.
+* **Action Required:** Log in via the Hugging Face UI widget to access the necessary models.
 
-Then compute the weight difference:
-
-ΔW = W_fused − W_base
-
-Apply Singular Value Decomposition:
-
-ΔW = U Σ Vᵀ
-
-- Approximate low-rank matrices  
-- Reconstruct a recovered LoRA adapter  
-
-The goal is to demonstrate that LoRA fusion does not necessarily prevent recovery.
+### 3. `metrics.ipynb` (Evaluation)
+* **What it does:** Opens the resulting files and conducts evaluation metrics, including CLIP embedding analysis and PCA (Principal Component Analysis) deconstruction. It also generates comparison images based on defined prompts.
+* **Action Required:** You must manually input your Hugging Face token into the code. You will also need to adjust the hardcoded prompts (see below).
 
 ---
 
-# Repository Files
+## A Note on Image Prompts
 
-train.ipynb  
-Copy_of_SDXL_DreamBooth_LoRA_.ipynb  
-README.md  
+In `metrics.ipynb`, the image generation relies on positive and negative prompts. These are currently **hardcoded for my specific project scenario** and must be changed if you are training on a different subject.
 
-- Copy_of_SDXL_DreamBooth_LoRA_.ipynb → Training + upload  
-- train.ipynb → Fusion + SVD reconstruction attack  
+* **Positive Prompts:** Text describing exactly what you *want* the model to generate (e.g., specific subjects, styles, lighting, or details).
+* **Negative Prompts:** Text describing what you *do not want* the model to generate (e.g., blurry, distorted, bad anatomy, wrong colors). 
 
----
-
-# Important Note About Notebook Preview
-
-These notebooks:
-
-- Generate images dynamically  
-- Require GPU runtime  
-- Load large diffusion models  
-- Save intermediate weights  
-
-Because of this:
-
-GitHub preview may not render them correctly.  
-Notebook outputs may appear missing in browser view.  
-
-However, everything works when the repository is cloned and run locally or in Google Colab.
+Be sure to update these variables in the `metrics.ipynb` notebook to match the custom training data you uploaded in Step 1.
 
 ---
 
-# How to Run
+## Important Note About Notebook Previews
 
-git clone <your-repo-url>  
-cd <repo-name>  
+Because these notebooks generate images dynamically, require GPU runtimes, load large diffusion models, and save intermediate weights:
+* GitHub preview may not render them correctly.  
+* Notebook outputs may appear missing in the browser view.  
 
-Then open the notebooks locally or upload them to Google Colab.
+Everything works as intended when the repository is cloned and run locally or in Google Colab.
